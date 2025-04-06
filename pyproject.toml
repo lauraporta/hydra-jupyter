@@ -1,0 +1,125 @@
+[project]
+name = "hydra-jupyter"
+authors = [{name = "Laura Porta", email= "porta.laura@proton.me"}]
+description = "Run hydra within a jupyter notebook"
+readme = "README.md"
+requires-python = ">=3.11.0"
+dynamic = ["version"]
+
+dependencies = [
+  "Ipython",
+  "numpy",
+  "pillow",
+]
+
+license = {text = "BSD-3-Clause"}
+
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: BSD License",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/lauraporta/hydra-jupyter"
+"Bug Tracker" = "https://github.com/lauraporta/hydra-jupyter/issues"
+"Documentation" = "https://lauraporta.github.io/hydra-jupyter"
+
+"Source Code" = "https://github.com/lauraporta/hydra-jupyter"
+"User Support" = "https://github.com/lauraporta/hydra-jupyter/issues"
+
+[project.optional-dependencies]
+dev = [
+  "pytest",
+  "pytest-cov",
+  "coverage",
+  "tox",
+  "mypy",
+  "pre-commit",
+  "ruff",
+  "setuptools-scm",
+]
+
+[build-system]
+requires = [
+    "setuptools>=64",
+    "wheel",
+    "setuptools-scm[toml]>=8",
+]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["hydra_jupyter*"]
+exclude = ["tests", "docs*"]
+
+
+[tool.pytest.ini_options]
+addopts = "--cov=hydra_jupyter"
+filterwarnings = [
+    "error",
+]
+
+[tool.setuptools_scm]
+
+[tool.check-manifest]
+ignore = [
+  ".yaml",
+  "tox.ini",
+  "tests/",
+  "tests/test_unit/",
+  "tests/test_integration/",
+  "docs/",
+  "docs/source/",
+]
+
+
+[tool.ruff]
+line-length = 79
+exclude = ["__init__.py", "build", ".eggs"]
+lint.select = [
+  "E",   # pycodestyle errors
+  "F",   # Pyflakes
+  "I",   # isort
+  # You can see what all the rules do here: https://docs.astral.sh/ruff/rules/
+  # Some additional ruff rules that might be useful (uncomment to enable)
+  #"UP",  # pyupgrade
+  #"B",   # flake8 bugbear
+  #"SIM", # flake8 simplify
+  #"C90", # McCabe complexity
+]
+fix = true
+
+[tool.ruff.format]
+docstring-code-format = true # Also format code in docstrings (e.g. examples)
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist = py{311,312,313}
+isolated_build = True
+
+[gh-actions]
+python =
+    3.11: py311
+    3.12: py312
+    3.13: py313
+
+[testenv]
+extras =
+    dev
+commands =
+    pytest -v --color=yes --cov=hydra_jupyter --cov-report=xml
+"""
+
+
+[tool.codespell]
+skip = '.git'
+check-hidden = true
