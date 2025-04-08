@@ -20,7 +20,7 @@ def get_active_session():
 
 class HydraSession:
     def __init__(
-        self, hydra_code="src(s0).out(o0);", detect_audio=False, style_css=True
+        self, hydra_code="src(s0).out(o0);", detect_audio=True, style_css=True
     ):
         self.hydra_code = hydra_code
         self.detect_audio = detect_audio
