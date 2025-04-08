@@ -1,57 +1,82 @@
 # hydra-jupyter
 
-Control [Hydra](https://hydra.ojack.xyz/) (livecoding visuals) directly from a Jupyter notebook.
-This package lets you send Hydra code to the browser, preview visuals in the notebook, and eventually manipulate textures with Python.
+`hydra-jupyter` is a lightweight Python interface for controlling [Hydra](https://github.com/ojack/hydra) visuals directly from Jupyter notebooks. It enables sending NumPy arrays as textures to Hydra, writing code snippets with cell magics, and controlling Hydra sessions without writing JavaScript manually.
 
----
+## Installation
 
-## ✨ Features
-
-- 📽️ Run Hydra code from a Jupyter notebook
-- 🧼 Apply custom CSS styles to clean up the notebook display
-- 🧪 Future support for sending Python-generated textures (2D/3D arrays)
-
----
-
-## 💡 Motivation
-
-Hydra is a powerful tool for livecoded visuals, but it's mainly used through a text editor and a browser.
-This package brings Hydra into Jupyter notebooks, allowing:
-
-- quick prototyping,
-- integration with data analysis or ML workflows,
-- and a more seamless experience for creative coders working in Python.
-
----
-
-## 🚀 Getting Started
-
-Clone the repo and install locally:
+Clone this repository and install in editable mode:
 
 ```bash
-git clone https://github.com/your-username/hydra-jupyter.git
+git clone https://github.com/lauraporta/hydra-jupyter.git
 cd hydra-jupyter
-pip install -e .
+pip install .
 ```
 
-Use it in your notebook:
+## Quickstart
+
+### 1. Start a session
 
 ```python
-from hydra_jupyter import initialize_hydra, set_all_css, run_hydra
+from hydra_jupyter import HydraSession
 
-# Set up Hydra and clean notebook styles
-initialize_hydra()
-set_all_css()
+session = HydraSession()
+```
+The default hydra scrpt will be `src(s0).out(o0);`.
 
-# Run a visual sketch
-run_hydra("osc(1, .4, 1).luma().kaleid().out()")
+### 2. Send an array
+
+```python
+import numpy as np
+
+# Example: simple gradient
+gradient = np.tile(np.linspace(0, 1, 256), (256, 1))
+session.send_array(gradient, source_id=0) # This will become your s0
 ```
 
----
+### 3. Write Hydra code in a notebook cell
 
-## 🤝 Contributing
+First, load the extension:
 
-Contributions are welcome!
+```python
+%load_ext hydra_jupyter.magic
+```
 
-If you have an idea, suggestion, or bug report, feel free to [open an issue](https://github.com/your-username/hydra-jupyter/issues).
-Whether it's a small fix or a big feature, we'd love to hear from you.
+Then use the magic:
+
+```python
+%%hydra
+src(s0)
+  .kaleid(5)
+  .rotate(0.1)
+  .out(o0)
+```
+
+### 4. Send animated stack
+
+```python
+def make_3d_pulsing_gradient(size=256, n_frames=30):
+    x = np.linspace(-1, 1, size)
+    y = np.linspace(-1, 1, size)
+    xx, yy = np.meshgrid(x, y)
+    radius = np.sqrt(xx**2 + yy**2)
+    stack = []
+    for i in range(n_frames):
+        scale = 1 + 0.5 * np.sin(2 * np.pi * i / n_frames)
+        pulse = np.clip(1 - radius * scale, 0, 1)
+        stack.append(pulse)
+    return np.stack(stack)
+
+frames = make_3d_pulsing_gradient()
+session.send_array(frames, frame_rate=15, source_id=0)
+```
+
+## Features
+
+- Send 2D or 3D NumPy arrays as textures
+- Reuse persistent Hydra sessions
+- Write Hydra code with `%%hydra` cell magic
+
+
+## Contributing
+
+Contributions are welcome! If you have suggestions for improvements or new features, please open an issue or submit a pull request.
